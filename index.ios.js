@@ -35,7 +35,7 @@ export default class WeaterApp extends React.Component {
   }
 
   componentDidUpdate(prevState) {
-    if(prevState.lat !== null && prevState.lng !== nullх) {
+    if(prevState.lat !== null && prevState.lng !== null) {
       this.fetchWeatherJSON();
     }
   }
@@ -60,13 +60,6 @@ export default class WeaterApp extends React.Component {
       });
   }
 
-
-
-    // return 
-  // convertToCesium() {
-  //   return Math.round((responseJson.main.temp - 273) * 9 / 5 + 32)
-  // }
-
   render() {
     return (
       <View>
@@ -81,20 +74,8 @@ export default class WeaterApp extends React.Component {
   }
 }
 
-        // <View style={styles.topHeader}>
-        //   <Text style={styles.textStyle}>Погода</Text>
-        //   <Text>{this.state.city}</Text>
-        //   <Text>{this.state.gradeC}</Text>
-        // </View>
-
 
 const styles = {
-  // container: {
-  //   flex: 1,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   backgroundColor: '#F5FCFF',
-  // },
   topHeader: {
     flex: 1,
     marginTop: 40,
