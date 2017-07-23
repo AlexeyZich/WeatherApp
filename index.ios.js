@@ -6,6 +6,8 @@ import {
   AppRegistry,
   ActivityIndicator,
   TouchableOpacity,
+  ScrollView,
+  StatusBar,
   RefreshControl,
 } from 'react-native';
 
@@ -18,7 +20,7 @@ export default class WeaterApp extends React.Component {
     this.state = {
       lat: null,
       lng: null,
-      refresh: false,
+      refreshing: false,
       isLoading: true,
       enterString: '',
       country: '',
@@ -27,7 +29,7 @@ export default class WeaterApp extends React.Component {
     }
   }
 
-  newGeolocation(a , b) {
+  newGeolocation(callback) {
     console.log(`newGeolocation`)
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -35,11 +37,32 @@ export default class WeaterApp extends React.Component {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
+        callback && callback()
       },
-      (error) => alert(JSON.stringify(error)), {
-        enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+      (error) => {
+        alert(JSON.stringify(error))
+        callback && callback()
+      }, {
+        enableHighAccuracy: true, timeout: 10000, maximumAge: 1000
       }
     );
+  }
+
+  pushToArray() {
+
+  }
+
+  _onRefresh() {
+    this.setState({
+      refreshing: true,
+    })
+    this.newGeolocation(() => {
+      this.setState({refreshing: false});
+    })
+  }
+
+  componentWillMount() {
+    StatusBar.setBarStyle('dark-content')
   }
 
   componentDidMount() {
@@ -80,19 +103,26 @@ export default class WeaterApp extends React.Component {
 
   render() {
     return (
-      <View>
-        <View style={styles.topHeader}>
-          <Text style={styles.textStyle}>Погода</Text>
-          <Text>Latitude{this.state.lat}</Text>
-          <Text>Longitude{this.state.lng}</Text>
-          <Text>{this.state.city}</Text>
-          <Text>{this.state.country}</Text>
-          <Text>{this.state.gradeC}</Text>
-          <TouchableOpacity onPress={ this.newGeolocation.bind(this, 'asdas') }>
-            <Text style={styles.textStyle}>Refresh</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <ScrollView 
+        contentContainerStyle={styles.contentContainer} 
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this._onRefresh.bind(this)}
+          />
+        }
+      >
+        <Text style={styles.textStyle}>Погода</Text>
+        <Text>Latitude{this.state.lat}</Text>
+        <Text>Longitude{this.state.lng}</Text>
+        <Text>{this.state.city}</Text>
+        <Text>{this.state.country}</Text>
+        <Text>{this.state.gradeC}</Text>
+        <TouchableOpacity onPress={ this.newGeolocation.bind(this) }>
+          <Text style={styles.textStyle}>Refresh</Text>
+        </TouchableOpacity>
+      </ScrollView>
     );
   }
 }
@@ -101,9 +131,13 @@ export default class WeaterApp extends React.Component {
 
 
 const styles = {
-  topHeader: {
+  scrollView: {
+    backgroundColor: 'white',
+  },
+  contentContainer: {
+    backgroundColor: 'white',
     flex: 1,
-    marginTop: 40,
+    paddingTop: 20,
     alignItems: 'center',
   },
   textStyle: {
