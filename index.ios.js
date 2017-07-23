@@ -9,6 +9,9 @@ import {
   RefreshControl,
 } from 'react-native';
 
+import Config from 'react-native-config'
+
+
 export default class WeaterApp extends React.Component {
   constructor(props) {
     super(props)
@@ -55,7 +58,8 @@ export default class WeaterApp extends React.Component {
 
   parseWeather() {
     console.log('parseWeather')
-    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${this.state.lat}&lon=${this.state.lng}&APPID=`    
+    const key = Config.OPENWEATHERMAP_API_KEY
+    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${this.state.lat}&lon=${this.state.lng}&APPID=${key}`    
     console.log(url);
     fetch(url)
       .then((response) => response.json())
