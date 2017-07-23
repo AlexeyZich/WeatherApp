@@ -5,6 +5,8 @@ import {
   View,
   AppRegistry,
   ActivityIndicator,
+  TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 
 export default class WeaterApp extends React.Component {
@@ -13,6 +15,7 @@ export default class WeaterApp extends React.Component {
     this.state = {
       lat: null,
       lng: null,
+      refresh: false,
       isLoading: true,
       enterString: '',
       country: '',
@@ -21,7 +24,8 @@ export default class WeaterApp extends React.Component {
     }
   }
 
-  componentDidMount() {
+  newGeolocation(a , b) {
+    console.log(`newGeolocation`)
     navigator.geolocation.getCurrentPosition(
       (position) => {
         this.setState({
@@ -29,18 +33,28 @@ export default class WeaterApp extends React.Component {
           lng: position.coords.longitude,
         });
       },
-      (error) => alert(JSON.stringify(error)),
-      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
+      (error) => alert(JSON.stringify(error)), {
+        enableHighAccuracy: true, timeout: 20000, maximumAge: 1000
+      }
     );
   }
 
-  componentDidUpdate(prevState) {
-    if(prevState.lat !== null && prevState.lng !== null) {
-      this.fetchWeatherJSON();
+  componentDidMount() {
+    console.log(`componentDidMount ${this.state.city}, ${this.state.country}, ${this.state.temp}`)
+    this.newGeolocation();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log('componentDidUpdate: ', prevProps, prevState)
+    console.log(this.props, this.state)
+    if ((prevState.lat !== this.state.lat) || (prevState.lng !== this.state.lng)) {
+      this.parseWeather()
     }
   }
 
-  fetchWeatherJSON() {
+
+  parseWeather() {
+    console.log('parseWeather')
     const url = `http://api.openweathermap.org/data/2.5/weather?lat=${this.state.lat}&lon=${this.state.lng}&APPID=`    
     console.log(url);
     fetch(url)
@@ -65,14 +79,21 @@ export default class WeaterApp extends React.Component {
       <View>
         <View style={styles.topHeader}>
           <Text style={styles.textStyle}>Погода</Text>
-          <Text>{this.state.country}</Text>
+          <Text>Latitude{this.state.lat}</Text>
+          <Text>Longitude{this.state.lng}</Text>
           <Text>{this.state.city}</Text>
+          <Text>{this.state.country}</Text>
           <Text>{this.state.gradeC}</Text>
+          <TouchableOpacity onPress={ this.newGeolocation.bind(this, 'asdas') }>
+            <Text style={styles.textStyle}>Refresh</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
   }
 }
+
+
 
 
 const styles = {
@@ -83,6 +104,9 @@ const styles = {
   },
   textStyle: {
     fontSize: 44,    
+  },
+  textButton: {
+    fontSize: 30,
   },
   welcome: {
     fontSize: 20,
